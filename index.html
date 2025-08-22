@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>solve math</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        .title {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .status {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .status.ready { color: green; }
+        .status.processing { color: orange; }
+        .status.error { color: red; }
+        
+        .input-section {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .input-section h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .text-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+        
+        .buttons-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #0078d4;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #106ebe;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .image-preview {
+            margin-left: auto;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .image-preview img {
+            max-height: 100px;
+            max-width: 100px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .progress-container {
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .progress-bar.active {
+            display: block;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #007bff;
+            animation: progress-animation 2s infinite;
+        }
+        
+        @keyframes progress-animation {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+        
+        .results-section {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            min-height: 400px;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom-color: #0078d4;
+            color: #0078d4;
+        }
+        
+        .tab:hover {
+            background-color: #e9ecef;
+        }
+        
+        .tab-content {
+            padding: 20px;
+            min-height: 350px;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .solution-text {
+            width: 100%;
+            min-height: 300px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            border-radius: 5px;
+            background-color: #fafafa;
+            white-space: pre-wrap;
+        }
+        
+        .visualization-area {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .math-symbol {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #0078d4;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .api-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+        
+        .math-formatted {
+            font-family: 'Times New Roman', serif;
+        }
+        
+        .superscript {
+            font-size: 0.8em;
+            vertical-align: super;
+        }
+        
+        .subscript {
+            font-size: 0.8em;
+            vertical-align: sub;
+        }
+        
+        .canvas-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+        }
+        
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #eee;
+        }
+        
+        .example-problems {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .example-btn {
+            padding: 5px 10px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        
+        .example-btn:hover {
+            background: #dee2e6;
+        }
+        .math-formatted {
+            font-family: 'Times New Roman', serif;
+        }
+
+        .superscript {
+            font-size: 0.8em;
+            vertical-align: super;
+        }
+
+        .subscript {
+            font-size: 0.8em;
+            vertical-align: sub;
+        }
+
+        .math-symbol-btn {
+            padding: 5px 10px;
+            margin: 2px;
+            background: #e9ecef;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .symbol-panel {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f8f9fa;
+        }
+
+        .symbol-group {
+            margin-bottom: 10px;
+        }
+
+        .symbol-group-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1 class="title">🧮 solve math</h1>
+        <div id="statusLabel" class="status ready">✅ready</div>
+        
+        <div class="api-warning">
+            <strong>Lưu ý:</strong> Đây là phiên bản web demo.
+        </div>
+        
+        <div class="input-section">
+            <h3>📝 Nhập đề toán</h3>
+            <textarea id="textInput" class="text-input" placeholder="Nhập đề toán của bạn vào đây...
+Ví dụ:
+- Giải phương trình x² - 5x + 6 = 0
+- Tính diện tích tam giác có ba cạnh 3, 4, 5
+- Tìm đạo hàm của hàm số y = x³ + 2x² - x + 1"></textarea>
+            <div class="symbol-panel">
+                <div class="symbol-group">
+                    <div class="symbol-group-title">Ký hiệu toán học:</div>
+                    <button class="math-symbol-btn" onclick="insertSymbol('²')">x²</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('³')">x³</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('√')">√</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('π')">π</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∞')">∞</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∫')">∫</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∑')">∑</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∂')">∂</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∆')">∆</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∠')">∠</button>
+                </div>
+                <div class="symbol-group">
+                    <div class="symbol-group-title">Quan hệ:</div>
+                    <button class="math-symbol-btn" onclick="insertSymbol('≠')">≠</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('≈')">≈</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('≡')">≡</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('≤')">≤</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('≥')">≥</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('≅')">≅</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∝')">∝</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('⊥')">⊥</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∥')">∥</button>
+                </div>
+                <div class="symbol-group">
+                    <div class="symbol-group-title">Phép toán:</div>
+                    <button class="math-symbol-btn" onclick="insertSymbol('±')">±</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('×')">×</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('÷')">÷</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('·')">·</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∩')">∩</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∪')">∪</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∈')">∈</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∉')">∉</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∀')">∀</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('∃')">∃</button>
+                </div>
+                <div class="symbol-group">
+                    <div class="symbol-group-title">Mũi tên:</div>
+                    <button class="math-symbol-btn" onclick="insertSymbol('→')">→</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('↔')">↔</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('⇒')">⇒</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('⇔')">⇔</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('↦')">↦</button>
+                </div>
+                <div class="symbol-group">
+                    <div class="symbol-group-title">Chữ Hy Lạp:</div>
+                    <button class="math-symbol-btn" onclick="insertSymbol('α')">α</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('β')">β</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('γ')">γ</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('δ')">δ</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('ε')">ε</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('θ')">θ</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('λ')">λ</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('μ')">μ</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('σ')">σ</button>
+                    <button class="math-symbol-btn" onclick="insertSymbol('ω')">ω</button>
+                </div>
+            </div>
+            <div class="example-problems">
+                <button class="example-btn" onclick="setExample('Giải phương trình x² - 5x + 6 = 0')">PT bậc 2</button>
+                <button class="example-btn" onclick="setExample('Tính diện tích tam giác có ba cạnh a=3, b=4, c=5')">Hình học</button>
+                <button class="example-btn" onclick="setExample('Tìm đạo hàm của y = x³ + 2x² - x + 1')">Đạo hàm</button>
+                <button class="example-btn" onclick="setExample('Tính giới hạn lim(x→∞) (2x+1)/(x-3)')">Giới hạn</button>
+            </div>
+            
+            <div class="buttons-container">
+                <input type="file" id="imageInput" class="file-input" accept="image/*">
+                <button class="btn btn-secondary" onclick="document.getElementById('imageInput').click()">
+                    📁 Chọn ảnh
+                </button>
+                
+                <button id="solveBtn" class="btn btn-primary" onclick="solveMath()">
+                    🧮 Giải toán
+                </button>
+                
+                <div id="imagePreview" class="image-preview">Chưa chọn ảnh</div>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div id="progressBar" class="progress-bar">
+                <div class="progress-bar-fill"></div>
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('solution', this)">📝 Lời giải</button>
+                <button class="tab" onclick="switchTab('visualization', this)">📊 Đồ thị/Hình vẽ</button>
+            </div>
+            
+            <div id="solutionTab" class="tab-content active">
+                <textarea id="solutionText" class="solution-text" readonly placeholder="Lời giải sẽ hiển thị ở đây..."></textarea>
+            </div>
+            
+            <div id="visualizationTab" class="tab-content">
+                <div class="visualization-area" id="visualizationContainer">
+                    <div class="math-symbol">📐📊📈</div>
+                    <h3>Khu vực hiển thị đồ thị/hình vẽ</h3>
+                    <p>Đồ thị và hình minh họa sẽ tự động tạo<br>dựa trên nội dung bài toán</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cấu hình API - giữ nguyên như yêu cầu
+        const API_KEY = "AIzaSyA1hn2RpP0rzLJuqUYTMDzsr_IFL8H41d8";
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+        
+        let currentImage = null;
+        
+        // Xử lý chọn ảnh
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImage = e.target.result;
+                    const preview = document.getElementById('imagePreview');
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        // Chèn ký hiệu toán học
+        function insertSymbol(symbol) {
+            const textInput = document.getElementById('textInput');
+            const startPos = textInput.selectionStart;
+            const endPos = textInput.selectionEnd;
+            const currentValue = textInput.value;
+            
+            textInput.value = currentValue.substring(0, startPos) + symbol + currentValue.substring(endPos);
+            textInput.focus();
+            textInput.selectionStart = startPos + symbol.length;
+            textInput.selectionEnd = startPos + symbol.length;
+        }
+        // Chuyển đổi tab
+        function switchTab(tabName, clickedElement = null) {
+            // Ẩn tất cả tab content
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Bỏ active class khỏi tất cả tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Hiển thị tab được chọn
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Kích hoạt tab button tương ứng
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            } else {
+                // Tự động tìm và kích hoạt tab button phù hợp
+                const tabs = document.querySelectorAll('.tab');
+                if (tabName === 'solution') {
+                    tabs[0].classList.add('active');
+                } else if (tabName === 'visualization') {
+                    tabs[1].classList.add('active');
+                }
+            }
+        }
+        
+        // Đặt ví dụ đề toán
+        function setExample(problem) {
+            document.getElementById('textInput').value = problem;
+        }
+        
+        // Hàm tạo prompt chi tiết
+        function createDetailedPrompt() {
+            return `Bạn là giáo viên toán giỏi của VietJack. Hãy giải bài toán theo đúng phong cách sư phạm Việt Nam:
+
+🎯 YÊU CẦU TRÌNH BÀY:
+• Dùng ký hiệu toán chuẩn: √, ², ³, π, ∞, ≤, ≥, ≠, ±, ∆, ∠
+• Ghi rõ "ta có:", "suy ra", "do đó", "theo định lý..."
+• Làm tròn số theo yêu cầu đề bài
+• Giải thích từng bước một cách tự nhiên
+
+📝 ĐỊNH DẠNG CHUẨN:
+
+**Lời giải:**
+
+**Xét** [mô tả bài toán/hình/điều kiện]
+
+**a)** [nếu có nhiều phần]
+Theo [định lý/công thức], ta có:
+[công thức cụ thể]
+⇒ [biến đổi từng bước]
+⇒ [kết quả]
+
+**Vậy** [kết luận cuối cùng với đơn vị]
+
+🔍 LƯU Ý ĐặC BIỆT:
+- Với tam giác: luôn nêu "Xét ∆ABC vuông tại..."
+- Với hình học: mô tả chi tiết cách vẽ hình
+- Với phương trình: nêu rõ điều kiện, miền nghiệm
+- Với bài thực tế: đọc kỹ đề, đơn vị đo
+- Kết luận phải có đơn vị và ý nghĩa thực tế
+
+Hãy giải như một giáo viên Việt Nam kinh nghiệm, logic rõ ràng, dễ hiểu!`;
+        }
+        function cleanFinalResult(solution) {
+            let cleaned = solution;
+            
+            // Xử lý các ký hiệu phân số bị lỗi
+            cleaned = cleaned.replace(/frac\{([^{}]+)\}\{([^{}]+)\}/g, '$1∕$2');
+            cleaned = cleaned.replace(/\\frac{([^{}]+)}{([^{}]+)}/g, '$1∕$2');
+            
+            // Xử lý các ký hiệu giới hạn bị lỗi
+            cleaned = cleaned.replace(/lim_\{([^{}]+)\}/g, 'lim($1)→');
+            cleaned = cleaned.replace(/lim_\{([^{}]+)\\to/g, 'lim($1)→');
+            
+            // Xóa các ký tự LaTeX còn sót
+            cleaned = cleaned.replace(/\\/g, '');
+            cleaned = cleaned.replace(/\$\$/g, '');
+            cleaned = cleaned.replace(/\$/g, '');
+            
+            // Xử lý các ký hiệu toán học đặc biệt
+            cleaned = cleaned.replace(/to∞/g, '→∞');
+            cleaned = cleaned.replace(/to ∞/g, '→∞');
+            cleaned = cleaned.replace(/rightarrow/g, '→');
+            
+            return cleaned;
+        }    
+        function formatSolution(solution) {
+            // Danh sách thay thế ký hiệu toán học mở rộng
+            const mathReplacements = [
+                // Vector và ký hiệu hình học
+                { pattern: /\\vec\{([^}]+)\}/g, replacement: (match, p1) => `→${p1}` },
+                { pattern: /\\overrightarrow\{([^}]+)\}/g, replacement: (match, p1) => `→${p1}` },
+                { pattern: /\\overleftrightarrow\{([^}]+)\}/g, replacement: (match, p1) => `↔${p1}` },
+                { pattern: /\\overline\{([^}]+)\}/g, replacement: (match, p1) => `${p1}̅` },
+                { pattern: /\\underline\{([^}]+)\}/g, replacement: (match, p1) => `${p1}̲` },
+                
+                // Ký hiệu góc và đoạn
+                { pattern: /\\hat\{([^}]+)\}/g, replacement: (match, p1) => `${p1}̂` },
+                { pattern: /\\widehat\{([^}]+)\}/g, replacement: (match, p1) => `${p1}̂` },
+                { pattern: /\\tilde\{([^}]+)\}/g, replacement: (match, p1) => `${p1}̃` },
+                { pattern: /\\widetilde\{([^}]+)\}/g, replacement: (match, p1) => `${p1}̃` },
+                { pattern: /\\dot\{([^}]+)\}/g, replacement: (match, p1) => `${p1}̇` },
+                { pattern: /\\ddot\{([^}]+)\}/g, replacement: (match, p1) => `${p1}̈` },
+                
+                // Phân số và căn thức
+                { pattern: /\\frac\{([^}]+)\}\{([^}]+)\}/g, replacement: (match, p1, p2) => `${p1}∕${p2}` },
+                { pattern: /\\dfrac\{([^}]+)\}\{([^}]+)\}/g, replacement: (match, p1, p2) => `${p1}∕${p2}` },
+                { pattern: /\\tfrac\{([^}]+)\}\{([^}]+)\}/g, replacement: (match, p1, p2) => `${p1}∕${p2}` },
+                { pattern: /\\sqrt\{([^}]+)\}/g, replacement: (match, p1) => `√${p1}` },
+                { pattern: /\\sqrt\[([^\]]+)\]\{([^}]+)\}/g, replacement: (match, p1, p2) => `^${p1}√${p2}` },
+                
+                // Giới hạn, tổng, tích phân
+                { pattern: /\\lim_\{([^}]+)\}/g, replacement: (match, p1) => `lim_${p1}→` },
+                { pattern: /\\lim_\{([^}]+)\}\^\{([^}]+)\}/g, replacement: (match, p1, p2) => `lim_${p1}→${p2}` },
+                { pattern: /\\sum_\{([^}]+)\}\^\{([^}]+)\}/g, replacement: (match, p1, p2) => `∑_${p1}^${p2}` },
+                { pattern: /\\prod_\{([^}]+)\}\^\{([^}]+)\}/g, replacement: (match, p1, p2) => `∏_${p1}^${p2}` },
+                { pattern: /\\int_\{([^}]+)\}\^\{([^}]+)\}/g, replacement: (match, p1, p2) => `∫_${p1}^${p2}` },
+                { pattern: /\\oint_\{([^}]+)\}\^\{([^}]+)\}/g, replacement: (match, p1, p2) => `∮_${p1}^${p2}` },
+                { pattern: /\\iint_\{([^}]+)\}\^\{([^}]+)\}/g, replacement: (match, p1, p2) => `∬_${p1}^${p2}` },
+                { pattern: /\\iiint_\{([^}]+)\}\^\{([^}]+)\}/g, replacement: (match, p1, p2) => `∭_${p1}^${p2}` },
+                
+                // Ký hiệu Hy Lạp
+                { pattern: /\\Alpha/g, replacement: 'Α' }, { pattern: /\\alpha/g, replacement: 'α' },
+                { pattern: /\\Beta/g, replacement: 'Β' }, { pattern: /\\beta/g, replacement: 'β' },
+                { pattern: /\\Gamma/g, replacement: 'Γ' }, { pattern: /\\gamma/g, replacement: 'γ' },
+                { pattern: /\\Delta/g, replacement: 'Δ' }, { pattern: /\\delta/g, replacement: 'δ' },
+                { pattern: /\\Epsilon/g, replacement: 'Ε' }, { pattern: /\\epsilon/g, replacement: 'ε' },
+                { pattern: /\\varepsilon/g, replacement: 'ε' }, { pattern: /\\Zeta/g, replacement: 'Ζ' },
+                { pattern: /\\zeta/g, replacement: 'ζ' }, { pattern: /\\Eta/g, replacement: 'Η' },
+                { pattern: /\\eta/g, replacement: 'η' }, { pattern: /\\Theta/g, replacement: 'Θ' },
+                { pattern: /\\theta/g, replacement: 'θ' }, { pattern: /\\vartheta/g, replacement: 'ϑ' },
+                { pattern: /\\Iota/g, replacement: 'Ι' }, { pattern: /\\iota/g, replacement: 'ι' },
+                { pattern: /\\Kappa/g, replacement: 'Κ' }, { pattern: /\\kappa/g, replacement: 'κ' },
+                { pattern: /\\Lambda/g, replacement: 'Λ' }, { pattern: /\\lambda/g, replacement: 'λ' },
+                { pattern: /\\Mu/g, replacement: 'Μ' }, { pattern: /\\mu/g, replacement: 'μ' },
+                { pattern: /\\Nu/g, replacement: 'Ν' }, { pattern: /\\nu/g, replacement: 'ν' },
+                { pattern: /\\Xi/g, replacement: 'Ξ' }, { pattern: /\\xi/g, replacement: 'ξ' },
+                { pattern: /\\Omicron/g, replacement: 'Ο' }, { pattern: /\\omicron/g, replacement: 'ο' },
+                { pattern: /\\Pi/g, replacement: 'Π' }, { pattern: /\\pi/g, replacement: 'π' },
+                { pattern: /\\Rho/g, replacement: 'Ρ' }, { pattern: /\\rho/g, replacement: 'ρ' },
+                { pattern: /\\Sigma/g, replacement: 'Σ' }, { pattern: /\\sigma/g, replacement: 'σ' },
+                { pattern: /\\Tau/g, replacement: 'Τ' }, { pattern: /\\tau/g, replacement: 'τ' },
+                { pattern: /\\Upsilon/g, replacement: 'Υ' }, { pattern: /\\upsilon/g, replacement: 'υ' },
+                { pattern: /\\Phi/g, replacement: 'Φ' }, { pattern: /\\phi/g, replacement: 'φ' },
+                { pattern: /\\varphi/g, replacement: 'φ' }, { pattern: /\\Chi/g, replacement: 'Χ' },
+                { pattern: /\\chi/g, replacement: 'χ' }, { pattern: /\\Psi/g, replacement: 'Ψ' },
+                { pattern: /\\psi/g, replacement: 'ψ' }, { pattern: /\\Omega/g, replacement: 'Ω' },
+                { pattern: /\\omega/g, replacement: 'ω' },
+                
+                // Ký hiệu toán học thông dụng
+                { pattern: /\\infty/g, replacement: '∞' }, { pattern: /\\angle/g, replacement: '∠' },
+                { pattern: /\\triangle/g, replacement: 'Δ' }, { pattern: /\\parallel/g, replacement: '∥' },
+                { pattern: /\\perp/g, replacement: '⊥' }, { pattern: /\\cong/g, replacement: '≅' },
+                { pattern: /\\sim/g, replacement: '∼' }, { pattern: /\\approx/g, replacement: '≈' },
+                { pattern: /\\simeq/g, replacement: '≃' }, { pattern: /\\asymp/g, replacement: '≍' },
+                { pattern: /\\equiv/g, replacement: '≡' }, { pattern: /\\propto/g, replacement: '∝' },
+                { pattern: /\\neq/g, replacement: '≠' }, { pattern: /\\ne/g, replacement: '≠' },
+                { pattern: /\\leq/g, replacement: '≤' }, { pattern: /\\le/g, replacement: '≤' },
+                { pattern: /\\geq/g, replacement: '≥' }, { pattern: /\\ge/g, replacement: '≥' },
+                { pattern: /\\ll/g, replacement: '≪' }, { pattern: /\\gg/g, replacement: '≫' },
+                { pattern: /\\subset/g, replacement: '⊂' }, { pattern: /\\supset/g, replacement: '⊃' },
+                { pattern: /\\subseteq/g, replacement: '⊆' }, { pattern: /\\supseteq/g, replacement: '⊇' },
+                { pattern: /\\in/g, replacement: '∈' }, { pattern: /\\notin/g, replacement: '∉' },
+                { pattern: /\\ni/g, replacement: '∋' }, { pattern: /\\emptyset/g, replacement: '∅' },
+                { pattern: /\\varnothing/g, replacement: '∅' }, { pattern: /\\cup/g, replacement: '∪' },
+                { pattern: /\\cap/g, replacement: '∩' }, { pattern: /\\bigcup/g, replacement: '⋃' },
+                { pattern: /\\bigcap/g, replacement: '⋂' }, { pattern: /\\setminus/g, replacement: '∖' },
+                { pattern: /\\complement/g, replacement: '∁' }, { pattern: /\\exists/g, replacement: '∃' },
+                { pattern: /\\forall/g, replacement: '∀' }, { pattern: /\\neg/g, replacement: '¬' },
+                { pattern: /\\lnot/g, replacement: '¬' }, { pattern: /\\land/g, replacement: '∧' },
+                { pattern: /\\lor/g, replacement: '∨' }, { pattern: /\\vee/g, replacement: '∨' },
+                { pattern: /\\wedge/g, replacement: '∧' }, { pattern: /\\Rightarrow/g, replacement: '⇒' },
+                { pattern: /\\implies/g, replacement: '⇒' }, { pattern: /\\Leftrightarrow/g, replacement: '⇔' },
+                { pattern: /\\iff/g, replacement: '⇔' }, { pattern: /\\mapsto/g, replacement: '↦' },
+                { pattern: /\\to/g, replacement: '→' }, { pattern: /\\rightarrow/g, replacement: '→' },
+                { pattern: /\\leftarrow/g, replacement: '←' }, { pattern: /\\leftrightarrow/g, replacement: '↔' },
+                { pattern: /\\uparrow/g, replacement: '↑' }, { pattern: /\\downarrow/g, replacement: '↓' },
+                { pattern: /\\updownarrow/g, replacement: '↕' },
+                
+                // Toán tử vi phân và vector
+                { pattern: /\\partial/g, replacement: '∂' }, { pattern: /\\nabla/g, replacement: '∇' },
+                { pattern: /\\grad/g, replacement: '∇' }, { pattern: /\\div/g, replacement: '÷' },
+                { pattern: /\\curl/g, replacement: '∇×' }, { pattern: /\\laplacian/g, replacement: 'Δ' },
+                
+                // Toán tử và ký hiệu
+                { pattern: /\\cdot/g, replacement: '·' }, { pattern: /\\times/g, replacement: '×' },
+                { pattern: /\\ast/g, replacement: '∗' }, { pattern: /\\star/g, replacement: '⋆' },
+                { pattern: /\\circ/g, replacement: '∘' }, { pattern: /\\bullet/g, replacement: '•' },
+                { pattern: /\\oplus/g, replacement: '⊕' }, { pattern: /\\otimes/g, replacement: '⊗' },
+                { pattern: /\\pm/g, replacement: '±' }, { pattern: /\\mp/g, replacement: '∓' },
+                { pattern: /\\dagger/g, replacement: '†' }, { pattern: /\\ddagger/g, replacement: '‡' },
+                
+                // Dấu ngoặc và ký hiệu nhóm
+                { pattern: /\\lbrace/g, replacement: '{' }, { pattern: /\\rbrace/g, replacement: '}' },
+                { pattern: /\\langle/g, replacement: '⟨' }, { pattern: /\\rangle/g, replacement: '⟩' },
+                { pattern: /\\lceil/g, replacement: '⌈' }, { pattern: /\\rceil/g, replacement: '⌉' },
+                { pattern: /\\lfloor/g, replacement: '⌊' }, { pattern: /\\rfloor/g, replacement: '⌋' },
+                { pattern: /\\lvert/g, replacement: '|' }, { pattern: /\\rvert/g, replacement: '|' },
+                { pattern: /\\lVert/g, replacement: '‖' }, { pattern: /\\rVert/g, replacement: '‖' },
+                
+                // Ký hiệu tập hợp số
+                { pattern: /\\mathbb\{R\}/g, replacement: 'ℝ' }, { pattern: /\\mathbb\{N\}/g, replacement: 'ℕ' },
+                { pattern: /\\mathbb\{Z\}/g, replacement: 'ℤ' }, { pattern: /\\mathbb\{Q\}/g, replacement: 'ℚ' },
+                { pattern: /\\mathbb\{C\}/g, replacement: 'ℂ' }, { pattern: /\\mathbb\{H\}/g, replacement: 'ℍ' },
+                
+                // Ký hiệu logic và tập hợp
+                { pattern: /\\aleph/g, replacement: 'ℵ' }, { pattern: /\\hbar/g, replacement: 'ℏ' },
+                { pattern: /\\imath/g, replacement: 'ı' }, { pattern: /\\jmath/g, replacement: 'ȷ' },
+                { pattern: /\\ell/g, replacement: 'ℓ' }, { pattern: /\\wp/g, replacement: '℘' },
+                { pattern: /\\Re/g, replacement: 'ℜ' }, { pattern: /\\Im/g, replacement: 'ℑ' },
+                { pattern: /\\mho/g, replacement: '℧' }, { pattern: /\\prime/g, replacement: '′' },
+                { pattern: /\\doubleprime/g, replacement: '″' }, { pattern: /\\backprime/g, replacement: '‵' },
+                
+                // Dấu chấm và khoảng trắng
+                { pattern: /\\ldots/g, replacement: '…' }, { pattern: /\\cdots/g, replacement: '⋯' },
+                { pattern: /\\vdots/g, replacement: '⋮' }, { pattern: /\\ddots/g, replacement: '⋱' },
+                { pattern: /\\colon/g, replacement: ':' }, { pattern: /\\coloncolon/g, replacement: '∷' },
+                { pattern: /\\quad/g, replacement: '    ' },
+                
+                // Xử lý công thức trong $...$ và $$...$$
+                { pattern: /\$(.+?)\$/g, replacement: (match, p1) => formatMathExpression(p1) },
+                { pattern: /\$\$(.+?)\$\$/g, replacement: (match, p1) => formatMathExpression(p1) },
+            ];
+
+            let formatted = solution;
+            
+            // Áp dụng tất cả các thay thế
+            for (const { pattern, replacement } of mathReplacements) {
+                formatted = formatted.replace(pattern, replacement);
+            }
+            
+            // Xử lý số mũ và chỉ số
+            formatted = formatted.replace(/\^(\d+)/g, (match, num) => superscript(num));
+            formatted = formatted.replace(/_(\d+)/g, (match, num) => subscript(num));
+            formatted = formatted.replace(/\^\{([^}]+)\}/g, (match, content) => formatSuperscript(content));
+            formatted = formatted.replace(/_\{([^}]+)\}/g, (match, content) => formatSubscript(content));
+            
+            // Thêm dòng trống giữa các phần để dễ đọc
+            const lines = formatted.split('\n');
+            const resultLines = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                resultLines.push(lines[i]);
+                // Thêm dòng trống sau các từ khóa quan trọng
+                if (["Vậy", "Suy ra", "Do đó", "Kết luận", "⇒", "→", "Đáp án"].some(keyword => lines[i].includes(keyword))) {
+                    if (i < lines.length - 1 && lines[i+1].trim()) {
+                        resultLines.push("");
+                    }
+                }
+            }
+            
+            return resultLines.join('\n');
+        }
+
+        // Hàm hỗ trợ cho số mũ
+        function superscript(num) {
+            const superscripts = {'0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹'};
+            return num.split('').map(digit => superscripts[digit] || digit).join('');
+        }
+
+        // Hàm hỗ trợ cho chỉ số dưới
+        function subscript(num) {
+            const subscripts = {'0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉'};
+            return num.split('').map(digit => subscripts[digit] || digit).join('');
+        }
+
+        // Hàm định dạng biểu thức toán học
+        function formatMathExpression(expr) {
+            // Xử lý các biểu thức toán học đơn giản
+            let formatted = expr;
+            
+            // Xử lý các ký hiệu đặc biệt
+            formatted = formatted.replace(/\\times/g, '×')
+                                .replace(/\\div/g, '÷')
+                                .replace(/\\pm/g, '±')
+                                .replace(/\\cdot/g, '·');
+            
+            return formatted;
+        }
+
+        // Hàm định dạng chỉ số trên
+        function formatSuperscript(content) {
+            return content.split('').map(char => {
+                if (/[0-9]/.test(char)) {
+                    return superscript(char);
+                } else if (char === '-') {
+                    return '⁻';
+                } else if (char === '+') {
+                    return '⁺';
+                }
+                return char;
+            }).join('');
+        }
+
+        // Hàm định dạng chỉ số dưới
+        function formatSubscript(content) {
+            return content.split('').map(char => {
+                if (/[0-9]/.test(char)) {
+                    return subscript(char);
+                } else if (char === '-') {
+                    return '₋';
+                } else if (char === '+') {
+                    return '₊';
+                }
+                return char;
+            }).join('');
+        }
+        
+        // Hàm tạo visualization đơn giản
+        function createVisualization(solution) {
+            const vizContainer = document.getElementById('visualizationContainer');
+            const solutionLower = solution.toLowerCase();
+            
+            // Xóa nội dung cũ
+            vizContainer.innerHTML = '';
+            
+            if (solutionLower.includes('tam giác') || solutionLower.includes('triangle')) {
+                // Phân tích thông tin tam giác từ lời giải
+                const sides = extractTriangleSides(solution);
+                vizContainer.innerHTML = `
+                    <div class="math-symbol">△</div>
+                    <h3>Tam giác ${sides ? `có các cạnh ${sides.a}, ${sides.b}, ${sides.c}` : ''}</h3>
+                    <div class="canvas-container">
+                        <canvas id="triangleCanvas" width="400" height="300"></canvas>
+                    </div>
+                    <p>Hình tam giác minh họa cho bài toán</p>
+                `;
+                drawTriangle(sides);
+            } else if (solutionLower.includes('hàm số') || solutionLower.includes('đồ thị') || 
+                    solutionLower.includes('f(x)') || solutionLower.includes('y=')) {
+                // Phân tích hàm số từ lời giải
+                const funcInfo = extractFunctionInfo(solution);
+                vizContainer.innerHTML = `
+                    <div class="math-symbol">📈</div>
+                    <h3>Đồ thị ${funcInfo ? `hàm số ${funcInfo.expression}` : 'hàm số'}</h3>
+                    <div class="canvas-container">
+                        <canvas id="functionCanvas" width="400" height="300"></canvas>
+                    </div>
+                    <p>Đồ thị minh họa cho hàm số</p>
+                `;
+                drawFunction(funcInfo);
+            } else if (solutionLower.includes('hình tròn') || solutionLower.includes('đường tròn') || 
+                    solutionLower.includes('circle') || solutionLower.includes('bán kính')) {
+                // Phân tích thông tin hình tròn từ lời giải
+                const radius = extractCircleRadius(solution);
+                vizContainer.innerHTML = `
+                    <div class="math-symbol">○</div>
+                    <h3>Hình tròn ${radius ? `có bán kính ${radius}` : ''}</h3>
+                    <div class="canvas-container">
+                        <canvas id="circleCanvas" width="400" height="300"></canvas>
+                    </div>
+                    <p>Hình tròn minh họa</p>
+                `;
+                drawCircle(radius);
+            } else if (solutionLower.includes('hệ phương trình') || solutionLower.includes('hệ pt')) {
+                vizContainer.innerHTML = `
+                    <div class="math-symbol">📊</div>
+                    <h3>Biểu đồ hệ phương trình</h3>
+                    <div class="canvas-container">
+                        <canvas id="equationCanvas" width="400" height="300"></canvas>
+                    </div>
+                    <p>Đồ thị minh họa hệ phương trình</p>
+                `;
+                drawEquationSystem(solution);
+            } else {
+                vizContainer.innerHTML = `
+                    <div class="math-symbol">📊</div>
+                    <h3>Biểu đồ minh họa</h3>
+                    <p>Hình vẽ minh họa sẽ tự động tạo<br>dựa trên loại bài toán cụ thể</p>
+                    <div style="margin-top: 20px; font-size: 14px; color: #666;">
+                        Các loại hình được hỗ trợ:<br>
+                        🔹 Đồ thị hàm số<br>
+                        🔹 Hình học phẳng (tam giác, hình tròn, đa giác)<br>
+                        🔹 Biểu đồ thống kê<br>
+                        🔹 Hệ phương trình
+                    </div>
+                `;
+            }
+        }
+        function extractTriangleSides(solution) {
+            const sideRegex = /cạnh.*?(\d+\.?\d*).*?(\d+\.?\d*).*?(\d+\.?\d*)/i;
+            const match = solution.match(sideRegex);
+            
+            if (match && match.length >= 4) {
+                return {
+                    a: parseFloat(match[1]),
+                    b: parseFloat(match[2]),
+                    c: parseFloat(match[3])
+                };
+            }
+            
+            // Nếu không tìm thấy, trả về tam giác mặc định
+            return { a: 3, b: 4, c: 5 };
+        }
+
+        // Hàm trích xuất thông tin hàm số từ lời giải
+        function extractFunctionInfo(solution) {
+            const funcRegex = /(y\s*[=:]\s*[^\\\n]+)/i;
+            const match = solution.match(funcRegex);
+            
+            if (match) {
+                return {
+                    expression: match[1].trim(),
+                    type: determineFunctionType(match[1])
+                };
+            }
+            
+            return null;
+        }
+
+        // Hàm xác định loại hàm số
+        function determineFunctionType(expression) {
+            if (expression.includes('x²') || expression.includes('x^2')) return 'quadratic';
+            if (expression.includes('x³') || expression.includes('x^3')) return 'cubic';
+            if (expression.includes('sin') || expression.includes('cos')) return 'trigonometric';
+            if (expression.includes('log') || expression.includes('ln')) return 'logarithmic';
+            return 'linear';
+        }
+
+        // Hàm trích xuất bán kính hình tròn từ lời giải
+        function extractCircleRadius(solution) {
+            const radiusRegex = /bán kính.*?(\d+\.?\d*)|r\s*[=:]\s*(\d+\.?\d*)/i;
+            const match = solution.match(radiusRegex);
+            
+            if (match) {
+                return match[1] ? parseFloat(match[1]) : (match[2] ? parseFloat(match[2]) : 5);
+            }
+            
+            return 5; // Bán kính mặc định
+        }
+
+        // Hàm vẽ tam giác chính xác
+        function drawTriangle(sides = {a: 3, b: 4, c: 5}) {
+            setTimeout(() => {
+                const canvas = document.getElementById('triangleCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Kiểm tra xem tam giác có vuông không (định lý Pythagoras)
+                const isRightTriangle = checkRightTriangle(sides);
+                const rightAngleIndex = isRightTriangle ? findRightAngleIndex(sides) : -1;
+                
+                // Tính toán tọa độ các đỉnh dựa trên độ dài các cạnh
+                const scale = 30; // Tỷ lệ phóng đại
+                const A = {x: 50, y: 250};
+                
+                // Đặt góc vuông ở đỉnh A nếu là tam giác vuông
+                let B, C;
+                
+                if (rightAngleIndex === 0) {
+                    // Góc vuông tại A
+                    B = {x: A.x + sides.c * scale, y: A.y};
+                    C = {x: A.x, y: A.y - sides.b * scale};
+                } else if (rightAngleIndex === 1) {
+                    // Góc vuông tại B
+                    B = {x: A.x + sides.a * scale, y: A.y};
+                    C = {x: A.x + sides.a * scale, y: A.y - sides.c * scale};
+                } else if (rightAngleIndex === 2) {
+                    // Góc vuông tại C
+                    B = {x: A.x + sides.b * scale, y: A.y};
+                    C = {x: A.x, y: A.y - sides.a * scale};
+                } else {
+                    // Tam giác không vuông - sử dụng công thức cosine
+                    const angle = Math.acos((sides.b*sides.b + sides.c*sides.c - sides.a*sides.a) / (2*sides.b*sides.c));
+                    B = {x: A.x + sides.c * scale, y: A.y};
+                    C = {x: A.x + sides.b * scale * Math.cos(angle), y: A.y - sides.b * scale * Math.sin(angle)};
+                }
+                
+                // Vẽ lưới
+                drawGrid(ctx, canvas.width, canvas.height);
+                
+                // Vẽ tam giác
+                ctx.strokeStyle = '#0078d4';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(A.x, A.y);
+                ctx.lineTo(B.x, B.y);
+                ctx.lineTo(C.x, C.y);
+                ctx.closePath();
+                ctx.stroke();
+                
+                // Vẽ góc vuông nếu là tam giác vuông
+                if (isRightTriangle) {
+                    ctx.strokeStyle = '#d40000';
+                    ctx.lineWidth = 2;
+                    
+                    let rightAngleX, rightAngleY, rightAngleSize = 15;
+                    
+                    if (rightAngleIndex === 0) {
+                        // Góc vuông tại A
+                        ctx.beginPath();
+                        ctx.moveTo(A.x + rightAngleSize, A.y);
+                        ctx.lineTo(A.x + rightAngleSize, A.y - rightAngleSize);
+                        ctx.lineTo(A.x, A.y - rightAngleSize);
+                        ctx.stroke();
+                    } else if (rightAngleIndex === 1) {
+                        // Góc vuông tại B
+                        ctx.beginPath();
+                        ctx.moveTo(B.x - rightAngleSize, B.y);
+                        ctx.lineTo(B.x - rightAngleSize, B.y + rightAngleSize);
+                        ctx.lineTo(B.x, B.y + rightAngleSize);
+                        ctx.stroke();
+                    } else if (rightAngleIndex === 2) {
+                        // Góc vuông tại C
+                        ctx.beginPath();
+                        ctx.moveTo(C.x, C.y + rightAngleSize);
+                        ctx.lineTo(C.x + rightAngleSize, C.y + rightAngleSize);
+                        ctx.lineTo(C.x + rightAngleSize, C.y);
+                        ctx.stroke();
+                    }
+                }
+                
+                // Đánh dấu các đỉnh
+                ctx.fillStyle = '#ff0000';
+                [A, B, C].forEach(point => {
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+                
+                // Ghi nhãn
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText('A', A.x - 20, A.y + 5);
+                ctx.fillText('B', B.x + 10, B.y + 5);
+                ctx.fillText('C', C.x, C.y - 10);
+                
+                // Ghi độ dài các cạnh
+                ctx.fillText(`${sides.a}`, (B.x + C.x) / 2 - 10, (B.y + C.y) / 2);
+                ctx.fillText(`${sides.b}`, (A.x + C.x) / 2, (A.y + C.y) / 2 - 10);
+                ctx.fillText(`${sides.c}`, (A.x + B.x) / 2, A.y + 20);
+                
+                // Ghi chú thích tam giác vuông
+                if (isRightTriangle) {
+                    ctx.fillStyle = '#d40000';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.fillText('Tam giác vuông', canvas.width / 2 - 50, 30);
+                }
+            }, 100);
+        }
+
+        // Hàm kiểm tra tam giác vuông
+        function checkRightTriangle(sides) {
+            const [a, b, c] = [sides.a, sides.b, sides.c].sort((x, y) => x - y);
+            return Math.abs(a*a + b*b - c*c) < 0.001; // Kiểm tra với sai số nhỏ
+        }
+
+        // Hàm tìm góc vuông trong tam giác
+        function findRightAngleIndex(sides) {
+            const {a, b, c} = sides;
+            
+            if (Math.abs(a*a + b*b - c*c) < 0.001) return 2; // Góc vuông tại C (đối diện cạnh c)
+            if (Math.abs(a*a + c*c - b*b) < 0.001) return 1; // Góc vuông tại B (đối diện cạnh b)
+            if (Math.abs(b*b + c*c - a*a) < 0.001) return 0; // Góc vuông tại A (đối diện cạnh a)
+            
+            return -1; // Không phải tam giác vuông
+        }
+
+        // Hàm vẽ đồ thị hàm số chính xác
+        function drawFunction(funcInfo = null) {
+            setTimeout(() => {
+                const canvas = document.getElementById('functionCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const scale = 20; // Tỷ lệ
+                
+                // Vẽ trục tọa độ
+                drawCoordinateSystem(ctx, canvas.width, canvas.height);
+                
+                // Vẽ đồ thị hàm số
+                ctx.strokeStyle = '#0078d4';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
+                // Vẽ đồ thị dựa trên loại hàm số
+                if (funcInfo && funcInfo.type === 'quadratic') {
+                    // Hàm bậc 2: y = ax² + bx + c
+                    for (let x = -200; x <= 200; x += 1) {
+                        const realX = x / scale;
+                        const realY = realX * realX; // y = x²
+                        const pixelX = centerX + x;
+                        const pixelY = centerY - realY * scale;
+                        
+                        if (x === -200) {
+                            ctx.moveTo(pixelX, pixelY);
+                        } else {
+                            ctx.lineTo(pixelX, pixelY);
+                        }
+                    }
+                } else if (funcInfo && funcInfo.type === 'trigonometric') {
+                    // Hàm lượng giác: y = sin(x) hoặc y = cos(x)
+                    for (let x = -200; x <= 200; x += 1) {
+                        const realX = x / scale;
+                        const realY = Math.sin(realX); // y = sin(x)
+                        const pixelX = centerX + x;
+                        const pixelY = centerY - realY * scale;
+                        
+                        if (x === -200) {
+                            ctx.moveTo(pixelX, pixelY);
+                        } else {
+                            ctx.lineTo(pixelX, pixelY);
+                        }
+                    }
+                } else {
+                    // Hàm mặc định: y = x
+                    for (let x = -200; x <= 200; x += 1) {
+                        const realX = x / scale;
+                        const realY = realX;
+                        const pixelX = centerX + x;
+                        const pixelY = centerY - realY * scale;
+                        
+                        if (x === -200) {
+                            ctx.moveTo(pixelX, pixelY);
+                        } else {
+                            ctx.lineTo(pixelX, pixelY);
+                        }
+                    }
+                }
+                
+                ctx.stroke();
+                
+                // Nhãn
+                ctx.fillStyle = '#000';
+                ctx.font = '14px Arial';
+                ctx.fillText('O', centerX + 5, centerY + 15);
+                ctx.fillText('x', canvas.width - 20, centerY + 15);
+                ctx.fillText('y', centerX + 5, 15);
+                
+                if (funcInfo) {
+                    ctx.fillText(funcInfo.expression, centerX + 50, 30);
+                } else {
+                    ctx.fillText('y = x', centerX + 50, 30);
+                }
+            }, 100);
+        }
+
+        // Hàm vẽ hình tròn chính xác
+        function drawCircle(radius = 5) {
+            setTimeout(() => {
+                const canvas = document.getElementById('circleCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const scaledRadius = radius * 20; // Tỷ lệ phóng đại
+                
+                // Vẽ lưới
+                drawGrid(ctx, canvas.width, canvas.height);
+                
+                // Vẽ hình tròn
+                ctx.strokeStyle = '#0078d4';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, scaledRadius, 0, 2 * Math.PI);
+                ctx.stroke();
+                
+                // Vẽ bán kính
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + scaledRadius, centerY);
+                ctx.stroke();
+                
+                // Vẽ đường kính
+                ctx.strokeStyle = '#00aa00';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX - scaledRadius, centerY);
+                ctx.lineTo(centerX + scaledRadius, centerY);
+                ctx.stroke();
+                
+                // Đánh dấu tâm
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Nhãn
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText('O', centerX - 15, centerY + 20);
+                ctx.fillStyle = '#ff0000';
+                ctx.fillText(`R = ${radius}`, centerX + scaledRadius/2 - 15, centerY - 10);
+                ctx.fillStyle = '#00aa00';
+                ctx.fillText(`D = ${radius*2}`, centerX, centerY + 35);
+            }, 100);
+        }
+
+        // Hàm vẽ hệ phương trình
+        function drawEquationSystem(solution) {
+            setTimeout(() => {
+                const canvas = document.getElementById('equationCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const scale = 20;
+                
+                // Vẽ trục tọa độ
+                drawCoordinateSystem(ctx, canvas.width, canvas.height);
+                
+                // Vẽ các đường thẳng của hệ phương trình
+                const colors = ['#0078d4', '#d40000', '#00d400'];
+                
+                // Giả lập vẽ một hệ phương trình tuyến tính
+                for (let i = 0; i < 2; i++) {
+                    ctx.strokeStyle = colors[i];
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    
+                    // Phương trình: y = mx + b
+                    const m = i === 0 ? 1 : -1; // hệ số góc
+                    const b = i === 0 ? 1 : -1; // hệ số tự do
+                    
+                    for (let x = -200; x <= 200; x += 1) {
+                        const realX = x / scale;
+                        const realY = m * realX + b;
+                        const pixelX = centerX + x;
+                        const pixelY = centerY - realY * scale;
+                        
+                        if (x === -200) {
+                            ctx.moveTo(pixelX, pixelY);
+                        } else {
+                            ctx.lineTo(pixelX, pixelY);
+                        }
+                    }
+                    
+                    ctx.stroke();
+                    
+                    // Nhãn phương trình
+                    ctx.fillStyle = colors[i];
+                    ctx.font = '14px Arial';
+                    ctx.fillText(`y = ${m}x ${b >= 0 ? '+' : ''}${b}`, centerX + 50, 30 + i*20);
+                }
+                
+                // Đánh dấu nghiệm (giao điểm)
+                ctx.fillStyle = '#ff9900';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY - (-1) * scale, 5, 0, 2 * Math.PI);
+                ctx.fill();
+            }, 100);
+        }
+
+        // Hàm vẽ lưới
+        function drawGrid(ctx, width, height) {
+            ctx.strokeStyle = '#f0f0f0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= width; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, height);
+                ctx.stroke();
+            }
+            for (let i = 0; i <= height; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(width, i);
+                ctx.stroke();
+            }
+        }
+
+        // Hàm vẽ hệ trục tọa độ
+        function drawCoordinateSystem(ctx, width, height) {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            // Vẽ lưới
+            drawGrid(ctx, width, height);
+            
+            // Trục X
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(width, centerY);
+            ctx.stroke();
+            
+            // Trục Y
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, height);
+            ctx.stroke();
+            
+            // Mũi tên trục X
+            ctx.beginPath();
+            ctx.moveTo(width - 10, centerY - 5);
+            ctx.lineTo(width, centerY);
+            ctx.lineTo(width - 10, centerY + 5);
+            ctx.fillStyle = '#333';
+            ctx.fill();
+            
+            // Mũi tên trục Y
+            ctx.beginPath();
+            ctx.moveTo(centerX - 5, 10);
+            ctx.lineTo(centerX, 0);
+            ctx.lineTo(centerX + 5, 10);
+            ctx.fill();
+            
+            // Vạch chia trên trục
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            const scale = 20;
+            for (let i = -10; i <= 10; i++) {
+                if (i === 0) continue;
+                
+                // Vạch trục X
+                ctx.beginPath();
+                ctx.moveTo(centerX + i * scale, centerY - 5);
+                ctx.lineTo(centerX + i * scale, centerY + 5);
+                ctx.stroke();
+                
+                // Vạch trục Y
+                ctx.beginPath();
+                ctx.moveTo(centerX - 5, centerY - i * scale);
+                ctx.lineTo(centerX + 5, centerY - i * scale);
+                ctx.stroke();
+                
+                // Nhãn trục X
+                if (i !== 0) {
+                    ctx.fillStyle = '#333';
+                    ctx.font = '10px Arial';
+                    ctx.fillText(i.toString(), centerX + i * scale - 3, centerY + 15);
+                }
+                
+                // Nhãn trục Y
+                if (i !== 0) {
+                    ctx.fillText(i.toString(), centerX - 15, centerY - i * scale + 3);
+                }
+            }
+        }
+
+        // Hàm vẽ tam giác
+        function drawTriangle() {
+            setTimeout(() => {
+                const canvas = document.getElementById('triangleCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Vẽ lưới
+                ctx.strokeStyle = '#f0f0f0';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= canvas.width; i += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, canvas.height);
+                    ctx.stroke();
+                }
+                for (let i = 0; i <= canvas.height; i += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(canvas.width, i);
+                    ctx.stroke();
+                }
+                
+                // Vẽ tam giác
+                const A = {x: 50, y: 250};
+                const B = {x: 350, y: 250};
+                const C = {x: 200, y: 50};
+                
+                ctx.strokeStyle = '#0078d4';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(A.x, A.y);
+                ctx.lineTo(B.x, B.y);
+                ctx.lineTo(C.x, C.y);
+                ctx.lineTo(A.x, A.y);
+                ctx.stroke();
+                
+                // Đánh dấu các đỉnh
+                ctx.fillStyle = '#ff0000';
+                [A, B, C].forEach(point => {
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+                
+                // Ghi nhãn
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText('A', A.x - 20, A.y + 5);
+                ctx.fillText('B', B.x + 10, B.y + 5);
+                ctx.fillText('C', C.x + 10, C.y - 10);
+            }, 100);
+        }
+        
+        // Hàm vẽ hàm số
+        function drawFunction() {
+            setTimeout(() => {
+                const canvas = document.getElementById('functionCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Vẽ trục tọa độ
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                
+                // Trục X
+                ctx.beginPath();
+                ctx.moveTo(0, centerY);
+                ctx.lineTo(canvas.width, centerY);
+                ctx.stroke();
+                
+                // Trục Y
+                ctx.beginPath();
+                ctx.moveTo(centerX, 0);
+                ctx.lineTo(centerX, canvas.height);
+                ctx.stroke();
+                
+                // Vẽ hàm y = x^2
+                ctx.strokeStyle = '#0078d4';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
+                for (let x = -200; x <= 200; x += 1) {
+                    const realX = x / 50; // Scale
+                    const realY = realX * realX;
+                    const pixelX = centerX + x;
+                    const pixelY = centerY - realY * 20;
+                    
+                    if (x === -200) {
+                        ctx.moveTo(pixelX, pixelY);
+                    } else {
+                        ctx.lineTo(pixelX, pixelY);
+                    }
+                }
+                ctx.stroke();
+                
+                // Nhãn
+                ctx.fillStyle = '#000';
+                ctx.font = '14px Arial';
+                ctx.fillText('O', centerX + 5, centerY + 15);
+                ctx.fillText('x', canvas.width - 20, centerY + 15);
+                ctx.fillText('y', centerX + 5, 15);
+                ctx.fillText('y = x²', centerX + 50, 50);
+            }, 100);
+        }
+        
+        // Hàm vẽ hình tròn
+        function drawCircle() {
+            setTimeout(() => {
+                const canvas = document.getElementById('circleCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = 100;
+                
+                // Vẽ hình tròn
+                ctx.strokeStyle = '#0078d4';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.stroke();
+                
+                // Vẽ bán kính
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + radius, centerY);
+                ctx.stroke();
+                
+                // Đánh dấu tâm
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Nhãn
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText('O', centerX - 15, centerY + 20);
+                ctx.fillStyle = '#ff0000';
+                ctx.fillText('R', centerX + radius/2 - 5, centerY - 10);
+            }, 100);
+        }
+        
+        // Hàm giải toán chính
+        async function solveMath() {
+            const textContent = document.getElementById('textInput').value.trim();
+            const statusLabel = document.getElementById('statusLabel');
+            const progressBar = document.getElementById('progressBar');
+            const solutionText = document.getElementById('solutionText');
+            const solveBtn = document.getElementById('solveBtn');
+            
+            // Kiểm tra input
+            if (!textContent && !currentImage) {
+                alert('Vui lòng nhập đề toán hoặc chọn ảnh!');
+                return;
+            }
+            
+            if (textContent === 'Nhập đề toán của bạn vào đây...' || textContent === '') {
+                alert('Vui lòng nhập đề toán!');
+                return;
+            }
+            
+            // Bắt đầu xử lý
+            statusLabel.textContent = '🔄 Đang phân tích đề bài...';
+            statusLabel.className = 'status processing';
+            progressBar.classList.add('active');
+            solveBtn.disabled = true;
+            solveBtn.textContent = 'Đang xử lý...';
+            
+            try {
+                const prompt = createDetailedPrompt();
+                
+                const requestBody = {
+                    contents: [{
+                        parts: [{
+                            text: `${prompt}\n\n**Đề bài:** ${textContent}`
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 2048,
+                    }
+                };
+                
+                // Nếu có ảnh, thêm vào request (cần xử lý base64)
+                if (currentImage) {
+                    const base64Data = currentImage.split(',')[1];
+                    requestBody.contents[0].parts.push({
+                        inline_data: {
+                            mime_type: "image/jpeg",
+                            data: base64Data
+                        }
+                    });
+                }
+                
+                statusLabel.textContent = 'đang giải toán...';
+                
+                const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    const solution = data.candidates[0].content.parts[0].text;
+                    let formattedSolution = formatSolution(solution);
+                    formattedSolution = cleanFinalResult(formattedSolution);
+                    
+                    solutionText.value = formattedSolution;
+                    createVisualization(formattedSolution);
+                    
+                    statusLabel.textContent = '✅ Giải toán thành công!';
+                    statusLabel.className = 'status ready';
+                    
+                    // Chuyển sang tab lời giải
+                    switchTab('solution');
+                } else {
+                    throw new Error('Không nhận được phản hồi từ AI');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                let errorMessage = error.message;
+                
+                if (errorMessage.includes('429') || errorMessage.includes('quota')) {
+                    errorMessage = 'API đã đạt giới hạn! Vui lòng thử lại sau vài phút.';
+                } else if (errorMessage.includes('API_KEY')) {
+                    errorMessage = 'API Key không hợp lệ. Vui lòng kiểm tra lại.';
+                }
+                
+                alert(`Lỗi: ${errorMessage}`);
+                statusLabel.textContent = '❌ Giải toán thất bại';
+                statusLabel.className = 'status error';
+                
+            } finally {
+                progressBar.classList.remove('active');
+                solveBtn.disabled = false;
+                solveBtn.textContent = '🧮 Giải toán';
+            }
+        }
+        
+        // Xử lý Enter để giải toán
+        document.getElementById('textInput').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                solveMath();
+            }
+        });
+        
+        // Khởi tạo khi trang load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kiểm tra API key
+            if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE') {
+                const statusLabel = document.getElementById('statusLabel');
+                statusLabel.textContent = '⚠️ Chưa cấu hình API Key';
+                statusLabel.className = 'status error';
+            }
+            
+            // Focus vào text input
+            document.getElementById('textInput').focus();
+        });
+        
+        // Xử lý paste ảnh
+        document.addEventListener('paste', function(e) {
+            const items = e.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const blob = items[i].getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        currentImage = event.target.result;
+                        const preview = document.getElementById('imagePreview');
+                        preview.innerHTML = `<img src="${event.target.result}" alt="Pasted image">`;
+                    };
+                    reader.readAsDataURL(blob);
+                    break;
+                }
+            }
+        });
+        
+        // Chức năng drag & drop ảnh
+        const mainContainer = document.querySelector('.main-container');
+        
+        mainContainer.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            mainContainer.style.border = '2px dashed #0078d4';
+        });
+        
+        mainContainer.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            mainContainer.style.border = 'none';
+        });
+        
+        mainContainer.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            mainContainer.style.border = 'none';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentImage = event.target.result;
+                    const preview = document.getElementById('imagePreview');
+                    preview.innerHTML = `<img src="${event.target.result}" alt="Dropped image">`;
+                };
+                reader.readAsDataURL(files[0]);
+            }
+        });
+        
+        // Shortcuts keyboard
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+N: New problem (clear all)
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                document.getElementById('textInput').value = '';
+                document.getElementById('solutionText').value = '';
+                document.getElementById('imagePreview').innerHTML = 'Chưa chọn ảnh';
+                currentImage = null;
+                document.getElementById('textInput').focus();
+            }
+            
+            // Ctrl+1: Focus on text input
+            if (e.ctrlKey && e.key === '1') {
+                e.preventDefault();
+                document.getElementById('textInput').focus();
+            }
+            
+            // Ctrl+2: Switch to solution tab
+            if (e.ctrlKey && e.key === '2') {
+                e.preventDefault();
+                switchTab('solution');
+                document.querySelectorAll('.tab')[0].click();
+            }
+            
+            // Ctrl+3: Switch to visualization tab
+            if (e.ctrlKey && e.key === '3') {
+                e.preventDefault();
+                switchTab('visualization');
+                document.querySelectorAll('.tab')[1].click();
+            }
+        });
+        
+        // Copy solution to clipboard
+        function copySolution() {
+            const solutionText = document.getElementById('solutionText');
+            solutionText.select();
+            document.execCommand('copy');
+            
+            // Show temporary notification
+            const notification = document.createElement('div');
+            notification.textContent = 'Đã copy lời giải!';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                z-index: 1000;
+                font-weight: bold;
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 2000);
+        }
+        
+        // Add copy button to solution tab
+        document.addEventListener('DOMContentLoaded', function() {
+            const solutionTab = document.getElementById('solutionTab');
+            const copyBtn = document.createElement('button');
+            copyBtn.textContent = '📋 Copy lời giải';
+            copyBtn.className = 'btn btn-secondary';
+            copyBtn.style.marginBottom = '10px';
+            copyBtn.onclick = copySolution;
+            
+            solutionTab.insertBefore(copyBtn, solutionTab.firstChild);
+        });
+        
+        // Math symbol input helper
+        const mathSymbols = {
+            'sqrt': '√',
+            'pi': 'π',
+            'infinity': '∞',
+            'alpha': 'α',
+            'beta': 'β',
+            'gamma': 'γ',
+            'delta': 'δ',
+            'theta': 'θ',
+            'lambda': 'λ',
+            'mu': 'μ',
+            'sigma': 'σ',
+            'phi': 'φ',
+            'omega': 'ω',
+            'leq': '≤',
+            'geq': '≥',
+            'neq': '≠',
+            'approx': '≈',
+            'pm': '±',
+            'times': '×',
+            'div': '÷',
+            'cdot': '·',
+            'angle': '∠',
+            'triangle': '∆',
+            'rightarrow': '→',
+            'Rightarrow': '⇒',
+            'leftrightarrow': '↔',
+            'Leftrightarrow': '⇔'
+        };
+        
+        // Auto-replace math symbols while typing
+        let lastTypedTime = 0;
+        document.getElementById('textInput').addEventListener('input', function(e) {
+            const now = Date.now();
+            if (now - lastTypedTime > 500) { // Debounce 500ms
+                let text = e.target.value;
+                let replaced = false;
+                
+                for (const [shortcut, symbol] of Object.entries(mathSymbols)) {
+                    const regex = new RegExp('\\b' + shortcut + '\\b', 'gi');
+                    if (regex.test(text)) {
+                        text = text.replace(regex, symbol);
+                        replaced = true;
+                    }
+                }
+                
+                if (replaced) {
+                    const cursorPos = e.target.selectionStart;
+                    e.target.value = text;
+                    e.target.setSelectionRange(cursorPos, cursorPos);
+                }
+            }
+            lastTypedTime = now;
+        });
+    </script>
+</body>
+</html>

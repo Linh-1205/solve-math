@@ -1495,6 +1495,763 @@ Hãy giải như một giáo viên Việt Nam kinh nghiệm, logic rõ ràng, d�
                 ctx.fillText('R', centerX + radius/2 - 5, centerY - 10);
             }, 100);
         }
+        // Hàm vẽ tam giác từ bài toán
+        function drawTriangleFromProblem(mathInfo) {
+            setTimeout(() => {
+                const canvas = document.getElementById('triangleCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                let A, B, C;
+                
+                if (mathInfo.data.type === 'coordinates') {
+                    // Vẽ theo tọa độ
+                    const scale = 30;
+                    const offsetX = canvas.width / 2;
+                    const offsetY = canvas.height / 2;
+                    
+                    A = { x: offsetX + mathInfo.data.A.x * scale, y: offsetY - mathInfo.data.A.y * scale };
+                    B = { x: offsetX + mathInfo.data.B.x * scale, y: offsetY - mathInfo.data.B.y * scale };
+                    C = { x: offsetX + mathInfo.data.C.x * scale, y: offsetY - mathInfo.data.C.y * scale };
+                } else {
+                    // Vẽ theo độ dài cạnh
+                    const { a, b, c } = mathInfo.data;
+                    const scale = Math.min(350 / Math.max(a, b, c), 25);
+                    
+                    A = { x: 50, y: canvas.height - 50 };
+                    B = { x: A.x + c * scale, y: A.y };
+                    
+                    // Tính tọa độ C bằng công thức cosine
+                    const angle = Math.acos((b*b + c*c - a*a) / (2*b*c));
+                    C = { 
+                        x: A.x + b * scale * Math.cos(angle), 
+                        y: A.y - b * scale * Math.sin(angle) 
+                    };
+                }
+                
+                // Vẽ lưới tọa độ
+                drawAdvancedGrid(ctx, canvas.width, canvas.height);
+                
+                // Vẽ tam giác
+                ctx.strokeStyle = '#0078d4';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(A.x, A.y);
+                ctx.lineTo(B.x, B.y);
+                ctx.lineTo(C.x, C.y);
+                ctx.closePath();
+                ctx.stroke();
+                
+                // Tô màu nhạt
+                ctx.fillStyle = 'rgba(0, 120, 212, 0.1)';
+                ctx.fill();
+                
+                // Vẽ góc vuông nếu có
+                if (mathInfo.data.isRight) {
+                    drawRightAngle(ctx, A, B, C, mathInfo.data.rightAngleIndex);
+                }
+                
+                // Đánh dấu các đỉnh
+                drawPoints(ctx, [A, B, C], ['A', 'B', 'C']);
+                
+                // Ghi độ dài cạnh
+                if (mathInfo.data.a) {
+                    drawSideLabels(ctx, A, B, C, mathInfo.data);
+                }
+                
+                // Tính và hiển thị thông tin
+                displayTriangleInfo(ctx, mathInfo.data, canvas.width);
+                
+            }, 100);
+        }
+        
+        // Hàm vẽ hàm số từ bài toán
+        function drawFunctionFromProblem(mathInfo) {
+            setTimeout(() => {
+                const canvas = document.getElementById('functionCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const scale = 20;
+                
+                // Vẽ hệ trục tọa độ
+                drawCoordinateSystem(ctx, canvas.width, canvas.height);
+                
+                // Vẽ đồ thị hàm số
+                ctx.strokeStyle = '#0078d4';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
+                let firstPoint = true;
+                const range = canvas.width / 2;
+                
+                for (let px = -range; px <= range; px += 1) {
+                    const x = px / scale;
+                    let y;
+                    
+                    try {
+                        y = evaluateFunction(mathInfo.data.expression, x);
+                        
+                        if (isFinite(y)) {
+                            const screenX = centerX + px;
+                            const screenY = centerY - y * scale;
+                            
+                            if (screenY >= 0 && screenY <= canvas.height) {
+                                if (firstPoint) {
+                                    ctx.moveTo(screenX, screenY);
+                                    firstPoint = false;
+                                } else {
+                                    ctx.lineTo(screenX, screenY);
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        firstPoint = true;
+                    }
+                }
+                
+                ctx.stroke();
+                
+                // Đánh dấu điểm đặc biệt
+                markSpecialPoints(ctx, mathInfo.data, centerX, centerY, scale);
+                
+                // Hiển thị thông tin hàm số
+                displayFunctionInfo(ctx, mathInfo.data);
+                
+            }, 100);
+        }
+        
+        // Hàm vẽ đường tròn từ bài toán
+        function drawCircleFromProblem(mathInfo) {
+            setTimeout(() => {
+                const canvas = document.getElementById('circleCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const data = mathInfo.data;
+                const centerX = canvas.width / 2 + data.center.x * 20;
+                const centerY = canvas.height / 2 - data.center.y * 20;
+                const radius = data.radius * 20;
+                
+                // Vẽ hệ trục tọa độ
+                drawCoordinateSystem(ctx, canvas.width, canvas.height);
+                
+                // Vẽ đường tròn
+                ctx.strokeStyle = '#0078d4';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.stroke();
+                
+                // Tô màu nhạt
+                ctx.fillStyle = 'rgba(0, 120, 212, 0.1)';
+                ctx.fill();
+                
+                // Vẽ bán kính
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + radius, centerY);
+                ctx.stroke();
+                
+                // Vẽ tâm
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 4, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Nhãn
+                ctx.font = 'bold 14px Arial';
+                ctx.fillText('O', centerX - 15, centerY + 20);
+                if (data.center.x !== 0 || data.center.y !== 0) {
+                    ctx.fillText(`(${data.center.x}, ${data.center.y})`, centerX - 20, centerY + 35);
+                }
+                
+                ctx.fillStyle = '#ff0000';
+                ctx.fillText(`R = ${data.radius}`, centerX + radius/2 - 15, centerY - 10);
+                
+                // Hiển thị phương trình
+                ctx.fillStyle = '#000';
+                ctx.font = '12px Arial';
+                ctx.fillText(data.equation, 10, 30);
+                
+            }, 100);
+        }
+        
+        // Hàm vẽ phương trình bậc 2
+        function drawQuadraticFromProblem(mathInfo) {
+            setTimeout(() => {
+                const canvas = document.getElementById('quadraticCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const scale = 20;
+                const data = mathInfo.data;
+                
+                // Vẽ hệ trục tọa độ
+                drawCoordinateSystem(ctx, canvas.width, canvas.height);
+                
+                // Vẽ parabol
+                ctx.strokeStyle = '#0078d4';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
+                let firstPoint = true;
+                for (let px = -canvas.width/2; px <= canvas.width/2; px += 2) {
+                    const x = px / scale;
+                    const y = data.a * x * x + data.b * x + data.c;
+                    
+                    const screenX = centerX + px;
+                    const screenY = centerY - y * scale;
+                    
+                    if (screenY >= 0 && screenY <= canvas.height) {
+                        if (firstPoint) {
+                            ctx.moveTo(screenX, screenY);
+                            firstPoint = false;
+                        } else {
+                            ctx.lineTo(screenX, screenY);
+                        }
+                    }
+                }
+                ctx.stroke();
+                
+                // Đánh dấu đỉnh parabol
+                if (data.vertex) {
+                    const vertexX = centerX + data.vertex.x * scale;
+                    const vertexY = centerY - data.vertex.y * scale;
+                    
+                    ctx.fillStyle = '#ff6600';
+                    ctx.beginPath();
+                    ctx.arc(vertexX, vertexY, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#000';
+                    ctx.font = '12px Arial';
+                    ctx.fillText(`Đỉnh (${data.vertex.x.toFixed(1)}, ${data.vertex.y.toFixed(1)})`, 
+                               vertexX + 10, vertexY - 10);
+                }
+                
+                // Đánh dấu nghiệm
+                if (data.roots && data.roots.length > 0) {
+                    ctx.fillStyle = '#00aa00';
+                    data.roots.forEach((root, index) => {
+                        const rootX = centerX + root * scale;
+                        const rootY = centerY;
+                        
+                        ctx.beginPath();
+                        ctx.arc(rootX, rootY, 5, 0, 2 * Math.PI);
+                        ctx.fill();
+                        
+                        ctx.fillStyle = '#000';
+                        ctx.fillText(`x${index+1} = ${root.toFixed(2)}`, rootX - 20, rootY + 20);
+                        ctx.fillStyle = '#00aa00';
+                    });
+                }
+                
+                // Hiển thị thông tin
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 14px Arial';
+                ctx.fillText(data.equation, 10, 30);
+                ctx.font = '12px Arial';
+                ctx.fillText(`Δ = ${data.delta.toFixed(2)}`, 10, 50);
+                
+            }, 100);
+        }
+        
+        // Hàm vẽ hình học tổng quát
+        function drawGeometryFromProblem(mathInfo) {
+            setTimeout(() => {
+                const canvas = document.getElementById('geometryCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const data = mathInfo.data;
+                
+                if (data.type === 'square') {
+                    drawSquare(ctx, data.side);
+                } else if (data.type === 'rectangle') {
+                    drawRectangle(ctx, data.width, data.height);
+                } else {
+                    // Vẽ hình tổng quát
+                    drawAdvancedGrid(ctx, canvas.width, canvas.height);
+                    ctx.fillStyle = '#666';
+                    ctx.font = '16px Arial';
+                    ctx.fillText('Hình minh họa tổng quát', canvas.width/2 - 80, canvas.height/2);
+                }
+                
+            }, 100);
+        }
+        
+        // Các hàm hỗ trợ
+        function drawAdvancedGrid(ctx, width, height) {
+            ctx.strokeStyle = '#f0f0f0';
+            ctx.lineWidth = 1;
+            
+            // Lưới 20px
+            for (let i = 0; i <= width; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, height);
+                ctx.stroke();
+            }
+            for (let i = 0; i <= height; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(width, i);
+                ctx.stroke();
+            }
+            
+            // Lưới đậm hơn mỗi 100px
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= width; i += 100) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, height);
+                ctx.stroke();
+            }
+            for (let i = 0; i <= height; i += 100) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(width, i);
+                ctx.stroke();
+            }
+        }
+        
+        function drawRightAngle(ctx, A, B, C, rightAngleIndex) {
+            ctx.strokeStyle = '#d40000';
+            ctx.lineWidth = 2;
+            const size = 20;
+            
+            let vertex, p1, p2;
+            
+            if (rightAngleIndex === 0) {
+                vertex = A; p1 = B; p2 = C;
+            } else if (rightAngleIndex === 1) {
+                vertex = B; p1 = A; p2 = C;
+            } else if (rightAngleIndex === 2) {
+                vertex = C; p1 = A; p2 = B;
+            }
+            
+            if (vertex && p1 && p2) {
+                const v1 = normalize({ x: p1.x - vertex.x, y: p1.y - vertex.y });
+                const v2 = normalize({ x: p2.x - vertex.x, y: p2.y - vertex.y });
+                
+                const corner1 = { x: vertex.x + v1.x * size, y: vertex.y + v1.y * size };
+                const corner2 = { x: vertex.x + v2.x * size, y: vertex.y + v2.y * size };
+                const corner3 = { x: corner1.x + v2.x * size, y: corner1.y + v2.y * size };
+                
+                ctx.beginPath();
+                ctx.moveTo(corner1.x, corner1.y);
+                ctx.lineTo(corner3.x, corner3.y);
+                ctx.lineTo(corner2.x, corner2.y);
+                ctx.stroke();
+            }
+        }
+        
+        function drawPoints(ctx, points, labels) {
+            ctx.fillStyle = '#ff0000';
+            points.forEach((point, index) => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText(labels[index], point.x - 15, point.y - 10);
+                ctx.fillStyle = '#ff0000';
+            });
+        }
+        
+        function drawSideLabels(ctx, A, B, C, data) {
+            ctx.fillStyle = '#000';
+            ctx.font = '14px Arial';
+            
+            // Cạnh a (BC)
+            const midBC = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
+            ctx.fillText(data.a.toString(), midBC.x + 5, midBC.y);
+            
+            // Cạnh b (AC)
+            const midAC = { x: (A.x + C.x) / 2, y: (A.y + C.y) / 2 };
+            ctx.fillText(data.b.toString(), midAC.x - 20, midAC.y);
+            
+            // Cạnh c (AB)
+            const midAB = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+            ctx.fillText(data.c.toString(), midAB.x, midAB.y + 20);
+        }
+        
+        function displayTriangleInfo(ctx, data, canvasWidth) {
+            ctx.fillStyle = '#000';
+            ctx.font = '12px Arial';
+            
+            let y = 20;
+            if (data.isRight) {
+                ctx.fillStyle = '#d40000';
+                ctx.font = 'bold 12px Arial';
+                ctx.fillText('Tam giác vuông', canvasWidth - 120, y);
+                y += 20;
+            }
+            
+            if (data.a && data.b && data.c) {
+                ctx.fillStyle = '#000';
+                ctx.font = '12px Arial';
+                const perimeter = data.a + data.b + data.c;
+                const s = perimeter / 2;
+                const area = Math.sqrt(s * (s - data.a) * (s - data.b) * (s - data.c));
+                
+                ctx.fillText(`Chu vi: ${perimeter.toFixed(2)}`, canvasWidth - 120, y);
+                ctx.fillText(`Diện tích: ${area.toFixed(2)}`, canvasWidth - 120, y + 15);
+            }
+        }
+        
+        function evaluateFunction(expression, x) {
+            // Thay thế các ký hiệu toán học
+            let expr = expression.toLowerCase()
+                .replace(/x²/g, `(${x}*${x})`)
+                .replace(/x\^2/g, `(${x}*${x})`)
+                .replace(/x³/g, `(${x}*${x}*${x})`)
+                .replace(/x\^3/g, `(${x}*${x}*${x})`)
+                .replace(/x/g, `(${x})`)
+                .replace(/sin/g, 'Math.sin')
+                .replace(/cos/g, 'Math.cos')
+                .replace(/tan/g, 'Math.tan')
+                .replace(/log/g, 'Math.log10')
+                .replace(/ln/g, 'Math.log')
+                .replace(/π/g, 'Math.PI')
+                .replace(/pi/g, 'Math.PI');
+            
+            try {
+                return eval(expr);
+            } catch (e) {
+                return NaN;
+            }
+        }
+        
+        function markSpecialPoints(ctx, data, centerX, centerY, scale) {
+            // Đánh dấu giao điểm với trục
+            ctx.fillStyle = '#ff6600';
+            
+            // Giao với trục y (x = 0)
+            try {
+                const y0 = evaluateFunction(data.expression, 0);
+                if (isFinite(y0)) {
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY - y0 * scale, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            } catch (e) {}
+        }
+        
+        function displayFunctionInfo(ctx, data) {
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText(`y = ${data.expression}`, 10, 30);
+            
+            ctx.font = '12px Arial';
+            ctx.fillText(`Loại: ${data.type}`, 10, 50);
+        }
+        
+        function drawSquare(ctx, side) {
+            const scale = Math.min(300 / side, 50);
+            const size = side * scale;
+            const x = (ctx.canvas.width - size) / 2;
+            const y = (ctx.canvas.height - size) / 2;
+            
+            drawAdvancedGrid(ctx, ctx.canvas.width, ctx.canvas.height);
+            
+            ctx.strokeStyle = '#0078d4';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x, y, size, size);
+            
+            ctx.fillStyle = 'rgba(0, 120, 212, 0.1)';
+            ctx.fillRect(x, y, size, size);
+            
+            ctx.fillStyle = '#000';
+            ctx.font = '14px Arial';
+            ctx.fillText(side.toString(), x + size/2 - 10, y - 10);
+            ctx.fillText(side.toString(), x - 25, y + size/2);
+        }
+        
+        function drawRectangle(ctx, width, height) {
+            const scale = Math.min(300 / Math.max(width, height), 50);
+            const w = width * scale;
+            const h = height * scale;
+            const x = (ctx.canvas.width - w) / 2;
+            const y = (ctx.canvas.height - h) / 2;
+            
+            drawAdvancedGrid(ctx, ctx.canvas.width, ctx.canvas.height);
+            
+            ctx.strokeStyle = '#0078d4';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x, y, w, h);
+            
+            ctx.fillStyle = 'rgba(0, 120, 212, 0.1)';
+            ctx.fillRect(x, y, w, h);
+            
+            ctx.fillStyle = '#000';
+            ctx.font = '14px Arial';
+            ctx.fillText(width.toString(), x + w/2 - 10, y - 10);
+            ctx.fillText(height.toString(), x - 25, y + h/2);
+        }
+        
+        function normalize(vector) {
+            const length = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+            return { x: vector.x / length, y: vector.y / length };
+        }
+        
+        function extractCoefficients(expression) {
+            // Trích xuất hệ số từ biểu thức
+            const quadMatch = expression.match(/([+-]?\d*\.?\d*)\s*x²/);
+            const linearMatch = expression.match(/([+-]?\d*\.?\d*)\s*x[^²³]/);
+            const constMatch = expression.match(/([+-]?\d+\.?\d*)(?!.*x)/);
+            
+            return {
+                a: quadMatch ? parseFloat(quadMatch[1]) || 1 : 0,
+                b: linearMatch ? parseFloat(linearMatch[1]) || 1 : 0,
+                c: constMatch ? parseFloat(constMatch[1]) : 0
+            };
+        }
+        
+        function extractDomain(text) {
+            const domainMatch = text.match(/x\s*∈\s*\[([^\]]+)\]/);
+            return domainMatch ? domainMatch[1] : 'ℝ';
+        }
+        
+        function extractRange(text) {
+            const rangeMatch = text.match(/y\s*∈\s*\[([^\]]+)\]/);
+            return rangeMatch ? rangeMatch[1] : 'ℝ';
+        }
+        
+        function determineFunctionType(expression) {
+            if (expression.includes('x²') || expression.includes('x^2')) return 'quadratic';
+            if (expression.includes('x³') || expression.includes('x^3')) return 'cubic';
+            if (expression.includes('sin') || expression.includes('cos') || expression.includes('tan')) return 'trigonometric';
+            if (expression.includes('log') || expression.includes('ln')) return 'logarithmic';
+            if (expression.includes('√') || expression.includes('sqrt')) return 'radical';
+            if (expression.includes('/') || expression.includes('1/x')) return 'rational';
+            if (expression.includes('^') && !expression.includes('x^2') && !expression.includes('x^3')) return 'exponential';
+            return 'linear';
+        }        // Hàm tạo visualization thông minh
+        function createVisualization(solution) {
+            const vizContainer = document.getElementById('visualizationContainer');
+            const textInput = document.getElementById('textInput').value;
+            const fullText = textInput + ' ' + solution;
+            const lowerText = fullText.toLowerCase();
+            
+            // Xóa nội dung cũ
+            vizContainer.innerHTML = '';
+            
+            // Phân tích từ đề bài và lời giải
+            const mathInfo = analyzeMathProblem(textInput, solution);
+            
+            if (mathInfo.type === 'triangle') {
+                vizContainer.innerHTML = `
+                    <div class="math-symbol">△</div>
+                    <h3>Tam giác ${mathInfo.details}</h3>
+                    <div class="canvas-container">
+                        <canvas id="triangleCanvas" width="500" height="400"></canvas>
+                    </div>
+                    <p>Hình tam giác được vẽ theo đề bài</p>
+                `;
+                drawTriangleFromProblem(mathInfo);
+            } else if (mathInfo.type === 'function') {
+                vizContainer.innerHTML = `
+                    <div class="math-symbol">📈</div>
+                    <h3>Đồ thị hàm số: ${mathInfo.expression}</h3>
+                    <div class="canvas-container">
+                        <canvas id="functionCanvas" width="500" height="400"></canvas>
+                    </div>
+                    <p>Đồ thị được vẽ theo phương trình</p>
+                `;
+                drawFunctionFromProblem(mathInfo);
+            } else if (mathInfo.type === 'circle') {
+                vizContainer.innerHTML = `
+                    <div class="math-symbol">○</div>
+                    <h3>Đường tròn ${mathInfo.details}</h3>
+                    <div class="canvas-container">
+                        <canvas id="circleCanvas" width="500" height="400"></canvas>
+                    </div>
+                    <p>Hình tròn được vẽ theo đề bài</p>
+                `;
+                drawCircleFromProblem(mathInfo);
+            } else if (mathInfo.type === 'quadratic') {
+                vizContainer.innerHTML = `
+                    <div class="math-symbol">📊</div>
+                    <h3>Phương trình bậc 2: ${mathInfo.equation}</h3>
+                    <div class="canvas-container">
+                        <canvas id="quadraticCanvas" width="500" height="400"></canvas>
+                    </div>
+                    <p>Đồ thị parabol và nghiệm</p>
+                `;
+                drawQuadraticFromProblem(mathInfo);
+            } else if (mathInfo.type === 'geometry') {
+                vizContainer.innerHTML = `
+                    <div class="math-symbol">📐</div>
+                    <h3>Hình học: ${mathInfo.details}</h3>
+                    <div class="canvas-container">
+                        <canvas id="geometryCanvas" width="500" height="400"></canvas>
+                    </div>
+                    <p>Hình vẽ minh họa bài toán hình học</p>
+                `;
+                drawGeometryFromProblem(mathInfo);
+            } else {
+                vizContainer.innerHTML = `
+                    <div class="math-symbol">📊</div>
+                    <h3>Minh họa toán học</h3>
+                    <p>Không thể tự động tạo hình vẽ cho loại bài này</p>
+                    <div style="margin-top: 20px; font-size: 14px; color: #666;">
+                        Các loại bài được hỗ trợ vẽ hình:<br>
+                        • Tam giác (với độ dài cạnh hoặc tọa độ)<br>
+                        • Đồ thị hàm số (bậc 1, 2, 3, lượng giác)<br>
+                        • Đường tròn, elip<br>
+                        • Phương trình bậc 2<br>
+                        • Hình học phẳng cơ bản
+                    </div>
+                `;
+            }
+        }
+        function extractAdvancedTriangleInfo(textInput, solution) {
+            const sideRegex = /cạnh.*?(\d+\.?\d*).*?(\d+\.?\d*).*?(\d+\.?\d*)/i;
+            const coordRegex = /A\s*\(\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\).*?B\s*\(\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\).*?C\s*\(\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)/i;
+            
+            let data = {};
+            const sideMatch = (textInput + ' ' + solution).match(sideRegex);
+            const coordMatch = (textInput + ' ' + solution).match(coordRegex);
+            
+            if (coordMatch) {
+                data = {
+                    type: 'coordinates',
+                    A: { x: parseFloat(coordMatch[1]), y: parseFloat(coordMatch[2]) },
+                    B: { x: parseFloat(coordMatch[3]), y: parseFloat(coordMatch[4]) },
+                    C: { x: parseFloat(coordMatch[5]), y: parseFloat(coordMatch[6]) }
+                };
+            } else if (sideMatch) {
+                data = {
+                    type: 'sides',
+                    a: parseFloat(sideMatch[1]),
+                    b: parseFloat(sideMatch[2]),
+                    c: parseFloat(sideMatch[3])
+                };
+                // Kiểm tra tam giác vuông
+                const sides = [data.a, data.b, data.c].sort((x, y) => x - y);
+                data.isRight = Math.abs(sides[0] * sides[0] + sides[1] * sides[1] - sides[2] * sides[2]) < 0.001;
+                data.rightAngleIndex = data.isRight ? (sides[2] === data.c ? 0 : sides[2] === data.b ? 1 : 2) : -1;
+            } else {
+                data = { type: 'sides', a: 3, b: 4, c: 5, isRight: true, rightAngleIndex: 2 }; // Giá trị mặc định
+            }
+            
+            return data;
+        }
+
+        function extractAdvancedFunctionInfo(textInput, solution) {
+            const funcRegex = /(y\s*[=:]\s*[^\\\n]+)/i;
+            const match = (textInput + ' ' + solution).match(funcRegex);
+            
+            if (match) {
+                return {
+                    expression: match[1].trim(),
+                    type: determineFunctionType(match[1]),
+                    domain: extractDomain(textInput + ' ' + solution),
+                    range: extractRange(textInput + ' ' + solution)
+                };
+            }
+            
+            return { expression: 'y = x', type: 'linear', domain: 'ℝ', range: 'ℝ' }; // Mặc định
+        }
+
+        function extractQuadraticInfo(textInput, solution) {
+            const quadRegex = /([+-]?\d*\.?\d*)\s*x²\s*([+-]\s*\d*\.?\d*)\s*x\s*([+-]\s*\d*\.?\d*)/i;
+            const match = (textInput + ' ' + solution).match(quadRegex);
+            
+            if (match) {
+                const a = parseFloat(match[1]) || 1;
+                const b = parseFloat(match[2]) || 0;
+                const c = parseFloat(match[3]) || 0;
+                const delta = b * b - 4 * a * c;
+                const roots = [];
+                if (delta >= 0) {
+                    roots.push((-b + Math.sqrt(delta)) / (2 * a));
+                    roots.push((-b - Math.sqrt(delta)) / (2 * a));
+                }
+                const vertex = { x: -b / (2 * a), y: (a * (-b / (2 * a)) ** 2 + b * (-b / (2 * a)) + c) };
+                
+                return {
+                    a, b, c,
+                    delta,
+                    roots,
+                    vertex,
+                    equation: `y = ${a}x² ${b >= 0 ? '+' : ''}${b}x ${c >= 0 ? '+' : ''}${c}`
+                };
+            }
+            
+            return { a: 1, b: 0, c: 0, delta: 0, roots: [0], vertex: { x: 0, y: 0 }, equation: 'y = x²' }; // Mặc định
+        }
+
+        function extractAdvancedCircleInfo(textInput, solution) {
+            const circleRegex = /\(x\s*-\s*([-\d.]+)\)\s*²\s*\+?\s*\(y\s*-\s*([-\d.]+)\)\s*²\s*=\s*(\d+\.?\d*)/i;
+            const radiusRegex = /bán kính.*?(\d+\.?\d*)|r\s*[=:]\s*(\d+\.?\d*)/i;
+            const match = (textInput + ' ' + solution).match(circleRegex);
+            const radiusMatch = (textInput + ' ' + solution).match(radiusRegex);
+            
+            if (match) {
+                return {
+                    center: { x: parseFloat(match[1]), y: parseFloat(match[2]) },
+                    radius: parseFloat(match[3]),
+                    equation: `(x - ${match[1]})² + (y - ${match[2]})² = ${match[3]}`
+                };
+            } else if (radiusMatch) {
+                return {
+                    center: { x: 0, y: 0 },
+                    radius: parseFloat(radiusMatch[1] || radiusMatch[2]),
+                    equation: `x² + y² = ${(radiusMatch[1] || radiusMatch[2]) ** 2}`
+                };
+            }
+            
+            return { center: { x: 0, y: 0 }, radius: 5, equation: 'x² + y² = 25' }; // Mặc định
+        }
+        function analyzeMathProblem(textInput, solution) {
+            const lowerText = (textInput + ' ' + solution).toLowerCase();
+            let mathInfo = { type: 'unknown', data: {}, details: '', expression: '', equation: '' };
+
+            if (lowerText.includes('tam giác') || lowerText.includes('triangle')) {
+                mathInfo.type = 'triangle';
+                mathInfo.data = extractAdvancedTriangleInfo(textInput, solution);
+                mathInfo.details = mathInfo.data.a ? `có các cạnh ${mathInfo.data.a}, ${mathInfo.data.b}, ${mathInfo.data.c}` : 'với tọa độ';
+            } else if (lowerText.includes('hàm số') || lowerText.includes('y=') || lowerText.includes('f(x)')) {
+                mathInfo.type = 'function';
+                mathInfo.data = extractAdvancedFunctionInfo(textInput, solution);
+                mathInfo.expression = mathInfo.data.expression || 'y = x';
+            } else if (lowerText.includes('đường tròn') || lowerText.includes('hình tròn') || lowerText.includes('circle')) {
+                mathInfo.type = 'circle';
+                mathInfo.data = extractAdvancedCircleInfo(textInput, solution);
+                mathInfo.details = `tâm (${mathInfo.data.center.x}, ${mathInfo.data.center.y}), bán kính ${mathInfo.data.radius}`;
+            } else if (lowerText.includes('phương trình bậc 2') || lowerText.includes('x²') || lowerText.includes('x^2')) {
+                mathInfo.type = 'quadratic';
+                mathInfo.data = extractQuadraticInfo(textInput, solution);
+                mathInfo.equation = mathInfo.data.equation || 'x² = 0';
+            } else if (lowerText.includes('hình vuông') || lowerText.includes('chữ nhật') || lowerText.includes('square') || lowerText.includes('rectangle')) {
+                mathInfo.type = 'geometry';
+                mathInfo.data = { type: lowerText.includes('hình vuông') ? 'square' : 'rectangle', side: 5, width: 6, height: 4 };
+                mathInfo.details = mathInfo.data.type === 'square' ? `cạnh ${mathInfo.data.side}` : `rộng ${mathInfo.data.width}, cao ${mathInfo.data.height}`;
+            }
+
+            return mathInfo;
+        }
         
         // Hàm giải toán chính
         async function solveMath() {
